@@ -18,11 +18,16 @@ class Server {
     public static ArrayList<Integer> getNumbersFromClient(Socket clientSocket) {
         String[] array = getDataFromClient(clientSocket).split(" ");
         ArrayList<Integer> numbers = new ArrayList<>();
-        for (int i = 0; i < array.length; i++)
+        for (int i = 0; i < array.length; i++){
+            System.out.print(i);
             try {
-                numbers.add(Integer.parseInt(array[i]));
+                System.out.println(array[i]);
+                numbers.add(Integer.parseInt(array[i].trim()));
+                
             } catch (Exception E) {
+                System.out.println(i);
             }
+        }
         return numbers;
     }
 
@@ -65,8 +70,17 @@ class MedianService extends Server {
             Collections.sort(numbers);
             System.out.println(numbers);
             int midindex = numbers.size() / 2;
-            sendDataToClient(client, "Median is : " + (numbers.size() % 2 == 1 ? numbers.get(midindex)
-                    : (numbers.get(midindex) + numbers.get(midindex - 1)) / 2));
+
+            if(midindex-1 <0){
+                sendDataToClient(client, "Median is : " + numbers.get(0));
+                client.close();
+                return ; 
+            }
+
+            double result = (numbers.size() % 2 == 1) ? Double.parseDouble(""+numbers.get(midindex)) : (numbers.get(midindex) + numbers.get(midindex - 1)) / 2.0 ; 
+
+            System.out.println("Result = " + numbers.size());
+            sendDataToClient(client, "Median is : " + result );
             client.close();
         }
     }
@@ -91,7 +105,7 @@ class MinMaxService extends Server {
 class FrequencyService extends Server {
     static void startService(int port) throws IOException {
         ServerSocket socket = new ServerSocket(port);
-        System.out.println("Started Sorting Server ...");
+        System.out.println("Started Frequency Server ...");
         Socket client;
         while (true) {
             client = socket.accept();
